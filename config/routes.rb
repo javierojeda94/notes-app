@@ -5,4 +5,9 @@ Rails.application.routes.draw do
   post 'signup' => 'auth#signup'
 
   resources :notes
+
+  scope 'users/:user_id' do
+    resources :notes, only: [:index, :show]
+  end
+
 end

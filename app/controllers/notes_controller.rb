@@ -1,9 +1,18 @@
 class NotesController < ApplicationController
 
   before_action :solve_note, only: [:show, :update, :destroy]
+  before_action :solve_searched_user, only: [:index, :show]
 
   def index
-    notes = Note.all
+    if @searched_user
+      if current_user == @searched_user
+        notes = current_user.notes
+      else
+        notes = Note.shared.where(user: @searched_user)
+      end
+    else
+      notes = Note.shared
+    end
     render json: notes, status: :ok
   end
 
@@ -26,7 +35,16 @@ class NotesController < ApplicationController
   end
 
   def show
-    render json: @note, status: :ok
+    begin
+      @searched_user ||= @note.user
+      if (current_user == @searched_user || @note.shared?) && @note.user == @searched_user
+        render json: @note, status: :ok
+      else
+        render status: :no_content
+      end
+    rescue ActiveRecord::RecordNotFound
+      render json: {error: "User not found with id #{params[:user_id]}"}, status: :not_found
+    end
   end
 
   def update
@@ -68,6 +86,16 @@ class NotesController < ApplicationController
       @note = Note.find id
     rescue ActiveRecord::RecordNotFound
       render json: {error: "Note not found with id #{id}"}, status: :not_found
+    end
+  end
+
+  def solve_searched_user
+    begin
+      if params[:user_id]
+        @searched_user = User.find params[:user_id]
+      end
+    rescue ActiveRecord::RecordNotFound
+      render json: {error: "User not found with id #{id}"}, status: :not_found
     end
   end
 
