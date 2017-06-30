@@ -14,20 +14,20 @@ class AuthorizeApiRequest
   attr_reader :headers
 
   def user
-    @user = User.find(decoded_token[:user_id]) if decoded_token
-    @user || errors.add(:token, 'Invalid token') && nil
+    begin
+      @user = User.find(decoded_token[:user_id]) if decoded_token
+      @user || errors.add(:token, 'Invalid token')
+    rescue ActiveRecord::RecordNotFound
+      nil
+    end
   end
 
   def decoded_token
-    JWTAuthentication.decode(auth_header)
+    token = auth_header
+    JWTAuthentication.decode(token) if token
   end
 
   def auth_header
-    if headers['Authorization'].present?
-      return headers['Authorization'].split(' ').last
-    else
-      errors.add(:token, 'Missing token')
-    end
-    nil
+    headers['Authorization'].split(' ').last if headers['Authorization'].present?
   end
 end

@@ -6,8 +6,12 @@ class JWTAuthentication
     end
 
     def decode(api_token)
-      body = JWT.decode(api_token, Rails.application.secrets.secret_key_base).first
-      HashWithIndifferentAccess.new body
+      begin
+        body = JWT.decode(api_token, Rails.application.secrets.secret_key_base).first
+        HashWithIndifferentAccess.new body
+      rescue JWT::DecodeError
+        return nil
+      end
     end
   end
 end
