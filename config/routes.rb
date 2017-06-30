@@ -3,4 +3,6 @@ Rails.application.routes.draw do
 
   post 'login' => 'auth#login'
   post 'signup' => 'auth#signup'
+
+  resources :notes
 end
