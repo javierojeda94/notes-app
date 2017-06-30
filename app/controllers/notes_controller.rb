@@ -38,7 +38,9 @@ class NotesController < ApplicationController
     begin
       @searched_user ||= @note.user
       if (current_user == @searched_user || @note.shared?) && @note.user == @searched_user
-        render json: @note, status: :ok
+        response = JSON.parse @note.to_json
+        response[:attachment_url] = @note.attachment.url
+        render json: response, status: :ok
       else
         render status: :no_content
       end
@@ -100,7 +102,7 @@ class NotesController < ApplicationController
   end
 
   def note_params
-    params.require(:note).permit(:title, :content, :shared)
+    params.require(:note).permit(:title, :content, :shared, :attachment)
   end
 
 end

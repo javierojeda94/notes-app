@@ -26,6 +26,9 @@ gem 'jwt'
 # Use simple_comand to handle user authentication
 gem 'simple_command'
 
+# User paperclip to handle files
+gem 'paperclip', '~> 5.0.0'
+
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
