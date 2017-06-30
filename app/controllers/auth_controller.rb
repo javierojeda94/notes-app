@@ -1,3 +1,5 @@
+require 'jwt_authentication'
+
 class AuthController < ApplicationController
 
   skip_before_action :authenticate_request
